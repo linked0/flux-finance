@@ -1,3 +1,12 @@
+# linked0 Flux
+## Test
+```
+forge test --match-test test_admin
+```
+or 
+```
+ft test_admin
+```
 # Introduction to Flux
 
 Flux Protocol is a Compound V2 fork that supports both permissioned and permissionless assets. The Flux protocol will support lending markets for USDC, DAI and OUSG (subject to governance vote [here](https://www.tally.xyz/gov/ondo-dao)). Users will be able to supply USDC, DAI and OUSG but only be able to borrow DAI and USDC.

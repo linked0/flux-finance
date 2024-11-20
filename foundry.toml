@@ -8,9 +8,10 @@ lib = ['forge-tests/lib']
 remappings = [
     'eth-gas-reporter/=node_modules/eth-gas-reporter/',
     'forge-tests/=forge-tests',
-    'lib/=lib/'
+    'lib/=lib/',
 ]
-fs_permissions = [{ access = "read", path = "./artifactsforge"}]
+fs_permissions = [{ access = "read", path = "./artifactsforge" }]
 libs = ["node_modules", "lib"]
+unchecked_cheatcode_artifacts = true
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config

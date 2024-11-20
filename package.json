@@ -26,6 +26,8 @@
     "test-forge-lending": "forge test --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2) --mp forge-tests/lending/**/**/**/*.sol --nmc Test_Prod",
     "test-forge-cash": "forge test --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2) --mp forge-tests/cash/**/**/*.sol",
     "test-forge-ci": "forge test --fork-url $FORGE_API_KEY_ETHEREUM --fork-block-number 16426621 --nmc Test_Prod",
+    "testc": "forge test --match-contract Test_Comptroller --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "testf": "forge test --match-test test_closeFactorMantissa --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
     "slither-check": "slither --solc-remaps @=node_modules/@",
     "deploy": "hardhat --network ethereum deploy"
   },
