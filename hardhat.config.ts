@@ -95,6 +95,11 @@ const config: HardhatUserConfig = {
       url: process.env.ETHEREUM_RPC_URL!,
       gas: 6000000,
     },
+    localnet: {
+      accounts: [process.env.ADMIN_KEY!],
+      url: process.env.LOCALNET_RPC_URL!,
+      gas: 6000000,
+    },
   },
   mocha: {
     timeout: 60 * 30 * 1000,
