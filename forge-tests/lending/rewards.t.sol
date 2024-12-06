@@ -24,6 +24,7 @@ contract TestRewards is BasicLendingMarket {
       oComptroller.compSupplyState(address(fDAI)).block,
       oComptroller.compBorrowState(address(fDAI)).block
     );
+    oComptroller.deleteLogs();
   }
 
   function test_rewards_noAccrual() public {
@@ -84,6 +85,41 @@ contract TestRewards is BasicLendingMarket {
     );
     test_rewards_initial();
   }
+
+  function test_rewards_noAccrual_jay() public {
+    // Do all actions that will update borrow/supply index & distribute borrow/supply comp
+
+    // Get last supply/borrow block numbers for checks later on
+    uint256 supplyBlockfDAI = oComptroller.compSupplyState(address(fDAI)).block;
+    uint256 borrowBlockfDAI = oComptroller.compBorrowState(address(fDAI)).block;
+    uint256 supplyBlockfUSDC = oComptroller
+      .compSupplyState(address(fUSDC))
+      .block;
+    uint256 borrowBlockfUSDC = oComptroller
+      .compBorrowState(address(fUSDC))
+      .block;
+
+    _addAddressToKYC(kycRequirementGroup, alice);
+    _addAddressToKYC(kycRequirementGroup, charlie);
+
+    // Mint & Transfer
+    enterMarkets(alice, address(fDAI), 1000e18);
+    enterMarkets(charlie, address(fUSDC), 1000e6);
+
+    // Check balances
+    console.log("alice fDAI:", fDAI.balanceOf(alice));
+    console.log("charlie fUSDC:", fUSDC.balanceOf(charlie));
+
+    // Borrow
+    vm.prank(alice);
+    fUSDC.borrow(1e8);
+    string[] memory logs = oComptroller.getLogs();
+    for (uint256 i = 0; i < logs.length; i++) {
+      console.log(logs[i]);
+    }
+    test_rewards_initial();
+  }
+
 
   function test_rewards_accrueSupply() public {
     _seedComptrollerWithOndo(1_000_000e18); //1M Ondo

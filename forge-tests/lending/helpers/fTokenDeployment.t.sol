@@ -67,6 +67,7 @@ contract fTokenDeploy is
       )
     );
     fCASH = ICToken(cCashDelegate);
+    console.log("fCASH: %s", uint256(uint160((address(fCASH)))));
     vm.label(address(fCASH), "fCASH");
 
     // Set Oracle Price
@@ -99,6 +100,7 @@ contract fTokenDeploy is
       )
     );
     fDAI = ICToken(fDaiDelegate);
+    console.log("fDAI: %s", uint256(uint160((address(fDAI)))));
 
     // Label
     vm.label(address(fDAI), "fDAI");
@@ -135,6 +137,7 @@ contract fTokenDeploy is
       )
     );
     fUSDC = ICToken(fUsdcDelegate);
+    console.log("fUSDC: %s", uint256(uint160((address(fUSDC)))));
 
     // Label
     vm.label(address(fUSDC), "fUSDC");
@@ -173,6 +176,7 @@ contract fTokenDeploy is
       )
     );
     fFRAX = ICToken(fFraxDelegate);
+    console.log("fFRAX: %s", uint256(uint160((address(fFRAX)))));
 
     // Label
     vm.label(address(fFRAX), "fFRAX");
@@ -204,6 +208,7 @@ contract fTokenDeploy is
       )
     );
     fLUSD = ICToken(fLusdDelegate);
+    console.log("fLUSD: %s", uint256(uint160((address(fLUSD)))));
 
     // Label
     vm.label(address(fLUSD), "fLUSD");
@@ -235,6 +240,7 @@ contract fTokenDeploy is
       )
     );
     fUSDT = ICToken(fUsdtDelegate);
+    console.log("fUSDT: %s", uint256(uint160((address(fUSDT)))));
 
     // Label
     vm.label(address(fUSDT), "fUSDT");

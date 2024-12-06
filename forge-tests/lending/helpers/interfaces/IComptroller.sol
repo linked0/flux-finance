@@ -15,6 +15,10 @@ interface IComptroller {
     uint[] memory borrowSpeeds
   ) external;
 
+  function getLog(uint index) external returns (string memory);
+  function getLogs() external returns (string[] memory);
+  function deleteLogs() external;
+
   function borrowGuardianPaused(address) external view returns (bool);
 
   function allMarkets() external view returns (address[] memory);

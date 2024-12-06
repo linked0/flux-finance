@@ -26,8 +26,11 @@
     "test-forge-lending": "forge test --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2) --mp forge-tests/lending/**/**/**/*.sol --nmc Test_Prod",
     "test-forge-cash": "forge test --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2) --mp forge-tests/cash/**/**/*.sol",
     "test-forge-ci": "forge test --fork-url $FORGE_API_KEY_ETHEREUM --fork-block-number 16426621 --nmc Test_Prod",
-    "testc": "forge test -vvvv --match-path comptrollerTest.t.sol --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
-    "testf": "forge test --match-test test_closeFactorMantissa --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "tf": "forge test -vvv --match-test test_rewards_noAccrual_jay --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "tf2": "forge test -vvv --match-test test_rewards_noAccrual --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "tfv": "forge test -vvvv --match-test test_rewards_noAccrual_jay --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "tp": "forge test -vvvv --match-path rewards.t.sol --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
+    "tc": "forge test -vvvv --match-contract TestRewards --fork-url $(grep -w FORGE_API_KEY_ETHEREUM .env | cut -d '=' -f2) --fork-block-number $(grep -w FORK_FROM_BLOCK_NUMBER .env | cut -d '=' -f2)",
     "slither-check": "slither --solc-remaps @=node_modules/@",
     "deploy": "hardhat --network ethereum deploy",
     "deploy:localnet": "hardhat --network localnet deploy"
