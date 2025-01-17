@@ -344,7 +344,7 @@ abstract contract CTokenInterface is CTokenStorage, OndoKYCStorage {
 
   function borrowBalanceStored(
     address account
-  ) external view virtual returns (uint);
+  ) external virtual returns (uint);
 
   function exchangeRateCurrent() external virtual returns (uint);
 

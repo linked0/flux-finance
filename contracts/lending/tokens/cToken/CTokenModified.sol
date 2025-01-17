@@ -407,6 +407,10 @@ abstract contract CTokenModified is
     uint reservesPrior = totalReserves;
     uint borrowIndexPrior = borrowIndex;
 
+    comptroller.pushLog("@@@ cashPrior", cashPrior);
+    comptroller.pushLog("@@@ borrowsPrior", borrowsPrior);
+    comptroller.pushLog("@@@ reservesPrior", reservesPrior);
+
     /* Calculate the current borrow interest rate */
     uint borrowRateMantissa = interestRateModel.getBorrowRate(
       cashPrior,
@@ -421,6 +425,11 @@ abstract contract CTokenModified is
     /* Calculate the number of blocks elapsed since the last accrual */
     uint blockDelta = currentBlockNumber - accrualBlockNumberPrior;
 
+    comptroller.pushLog("@@@ borrowIndex", borrowIndex);
+    comptroller.pushLog("@@@ borrowsPrior", borrowsPrior);
+    comptroller.pushLog("@@@ borrowRateMantissa", borrowRateMantissa);
+    comptroller.pushLog("@@@ blockDelta", blockDelta);
+
     /*
      * Calculate the interest accumulated into borrows and reserves and the new index:
      *  simpleInterestFactor = borrowRate * blockDelta
@@ -434,6 +443,7 @@ abstract contract CTokenModified is
       Exp({mantissa: borrowRateMantissa}),
       blockDelta
     );
+    comptroller.pushLog("@@@ simpleInterestFactor", simpleInterestFactor.mantissa);
     uint interestAccumulated = mul_ScalarTruncate(
       simpleInterestFactor,
       borrowsPrior
@@ -449,6 +459,8 @@ abstract contract CTokenModified is
       borrowIndexPrior,
       borrowIndexPrior
     );
+    comptroller.pushLog("@@@ totalBorrowsNew", totalBorrowsNew);
+    comptroller.pushLog("@@@ borrowIndexNew", borrowIndexNew);
 
     /////////////////////////
     // EFFECTS & INTERACTIONS
@@ -489,6 +501,7 @@ abstract contract CTokenModified is
    * @param mintAmount The amount of the underlying asset to supply
    */
   function mintFresh(address minter, uint mintAmount) internal {
+    comptroller.pushLog("mintAmount", mintAmount);
     /* Revert if sanctioned */
     require(!sanctionsList.isSanctioned(minter), "Minter is sanctioned");
 
@@ -504,6 +517,7 @@ abstract contract CTokenModified is
     }
 
     Exp memory exchangeRate = Exp({mantissa: exchangeRateStoredInternal()});
+    comptroller.pushLog("CTokenModified::exchangeRate", exchangeRate.mantissa);
 
     /////////////////////////
     // EFFECTS & INTERACTIONS
@@ -518,6 +532,7 @@ abstract contract CTokenModified is
      *  of cash.
      */
     uint actualMintAmount = doTransferIn(minter, mintAmount);
+    comptroller.pushLog("actualMintAmount", actualMintAmount);
 
     /*
      * We get the current exchange rate and calculate the number of cTokens to be minted:
@@ -525,6 +540,7 @@ abstract contract CTokenModified is
      */
 
     uint mintTokens = div_(actualMintAmount, exchangeRate);
+    comptroller.pushLog("mintTokens", mintTokens);
 
     /*
      * We calculate the new total supply of cTokens and minter token balance, checking for overflow:
@@ -721,6 +737,7 @@ abstract contract CTokenModified is
     accountBorrows[borrower].interestIndex = borrowIndex;
     totalBorrows = totalBorrowsNew;
 
+    comptroller.pushLog("### borrowAmount", borrowAmount);
     /*
      * We invoke doTransferOut for the borrower and the borrowAmount.
      *  Note: The cToken must handle variations between ERC-20 and ETH underlying.

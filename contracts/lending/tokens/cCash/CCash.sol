@@ -41,7 +41,7 @@ contract CCash is CTokenCash, CErc20Interface {
     // CToken initialize does the bulk of the work
     super.initialize(
       comptroller_,
-      interestRateModel_,
+      interestRateModel_, 
       initialExchangeRateMantissa_,
       name_,
       symbol_,

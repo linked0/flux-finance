@@ -125,6 +125,10 @@ contract Comptroller is
 
   string[] internal logs;
 
+  function pushLog(string calldata log, uint value) external {
+    logs.push(uintToString(log, value));
+  }
+
   function getLog(uint index) external returns (string memory) {
     return logs[index];
   }
@@ -220,6 +224,8 @@ contract Comptroller is
     accountAssets[borrower].push(cToken);
 
     emit MarketEntered(cToken, borrower);
+
+    logs.push(addressToString("### borrower", borrower));
 
     return Error.NO_ERROR;
   }
@@ -485,8 +491,6 @@ contract Comptroller is
       return uint(Error.INSUFFICIENT_LIQUIDITY);
     }
 
-    logs.push(uintToString("shortfall", shortfall));
-
     // Keep the flywheel moving
     Exp memory borrowIndex = Exp({mantissa: CToken(cToken).borrowIndex()});
     updateCompBorrowIndex(cToken, borrowIndex);
@@ -512,6 +516,22 @@ contract Comptroller is
         _value /= 10;
     }
     return string(abi.encodePacked(prefix, ": ", string(buffer)));
+}
+
+function addressToString(string memory prefix, address _addr) internal pure returns (string memory) {
+    // Convert address to bytes
+    bytes20 value = bytes20(_addr);
+    bytes memory alphabet = "0123456789abcdef";
+
+    bytes memory str = new bytes(2 + 40);
+    str[0] = '0';
+    str[1] = 'x';
+    for (uint i = 0; i < 20; i++) {
+        str[2 + i * 2] = alphabet[uint(uint8(value[i] >> 4))];
+        str[3 + i * 2] = alphabet[uint(uint8(value[i] & 0x0f))];
+    }
+
+    return string(abi.encodePacked(prefix, ": ", str));
 }
 
   /**
@@ -910,7 +930,7 @@ contract Comptroller is
     CToken[] memory assets = accountAssets[account];
     for (uint i = 0; i < assets.length; i++) {
       CToken asset = assets[i];
-      logs.push(uintToString("asset", uint256(address(asset))));
+      logs.push(uintToString("### asset", uint256(address(asset))));
 
       // Read the balances and exchange rate from the cToken
       (
@@ -933,10 +953,11 @@ contract Comptroller is
       if (vars.oraclePriceMantissa == 0) {
         return (Error.PRICE_ERROR, 0, 0);
       }
-      logs.push(uintToString("vars.cTokenBalance", vars.cTokenBalance));
+      // logs.push(uintToString("vars.cTokenBalance", vars.cTokenBalance));
       logs.push(uintToString("vars.collateralFactor", vars.collateralFactor.mantissa));
-      logs.push(uintToString("vars.oraclePriceMantissa", vars.oraclePriceMantissa));
+      // logs.push(uintToString("vars.oraclePriceMantissa", vars.oraclePriceMantissa));
       vars.oraclePrice = Exp({mantissa: vars.oraclePriceMantissa});
+      logs.push(uintToString("vars.oraclePriceMantissa", vars.oraclePriceMantissa));
 
       // Pre-compute a conversion factor from tokens -> ether (normalized price value)
       vars.tokensToDenom = mul_(
@@ -960,6 +981,7 @@ contract Comptroller is
 
       // Calculate effects of interacting with cTokenModify
       if (asset == cTokenModify) {
+        logs.push(uintToString("\t### cTokenModify", uint256(address(cTokenModify))));
         // redeem effect
         // sumBorrowPlusEffects += tokensToDenom * redeemTokens
         vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(
@@ -978,8 +1000,8 @@ contract Comptroller is
       }
     }
 
-    logs.push(uintToString("vars.sumCollateral", vars.sumCollateral));
-    logs.push(uintToString("vars.sumBorrowPlusEffects", vars.sumBorrowPlusEffects));
+    // logs.push(uintToString("vars.sumCollateral", vars.sumCollateral));
+    // logs.push(uintToString("vars.sumBorrowPlusEffects", vars.sumBorrowPlusEffects));
 
     // These are safe, as the underflow condition is checked first
     if (vars.sumCollateral > vars.sumBorrowPlusEffects) {

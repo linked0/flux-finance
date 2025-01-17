@@ -12,6 +12,7 @@ abstract contract ComptrollerInterface {
   ) external virtual returns (uint[] memory);
 
   function exitMarket(address cToken) external virtual returns (uint);
+  function pushLog(string calldata log, uint value) external virtual;
 
   /*** Policy Hooks ***/
 

@@ -515,7 +515,7 @@ contract CTokenInterface is CTokenStorage, OndoKYCStorage {
 
   function getAccountSnapshot(
     address account
-  ) external view returns (uint256, uint256, uint256, uint256);
+  ) external returns (uint256, uint256, uint256, uint256);
 
   function borrowRatePerBlock() external view returns (uint256);
 
@@ -525,7 +525,7 @@ contract CTokenInterface is CTokenStorage, OndoKYCStorage {
 
   function borrowBalanceCurrent(address account) external returns (uint256);
 
-  function borrowBalanceStored(address account) public view returns (uint256);
+  function borrowBalanceStored(address account) public returns (uint256);
 
   function exchangeRateCurrent() public returns (uint256);
 
@@ -951,8 +951,8 @@ contract CErc20DelegatorKYC is
    */
   function getAccountSnapshot(
     address account
-  ) external view returns (uint256, uint256, uint256, uint256) {
-    bytes memory data = delegateToViewImplementation(
+  ) external returns (uint256, uint256, uint256, uint256) {
+    bytes memory data = delegateToImplementation(
       abi.encodeWithSignature("getAccountSnapshot(address)", account)
     );
     return abi.decode(data, (uint256, uint256, uint256, uint256));
@@ -1008,8 +1008,8 @@ contract CErc20DelegatorKYC is
    * @param account The address whose balance should be calculated
    * @return The calculated balance
    */
-  function borrowBalanceStored(address account) public view returns (uint256) {
-    bytes memory data = delegateToViewImplementation(
+  function borrowBalanceStored(address account) public returns (uint256) {
+    bytes memory data = delegateToImplementation(
       abi.encodeWithSignature("borrowBalanceStored(address)", account)
     );
     return abi.decode(data, (uint256));

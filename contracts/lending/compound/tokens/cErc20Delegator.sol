@@ -459,7 +459,7 @@ contract CTokenInterface is CTokenStorage {
 
   function borrowBalanceCurrent(address account) external returns (uint256);
 
-  function borrowBalanceStored(address account) public view returns (uint256);
+  function borrowBalanceStored(address account) public returns (uint256);
 
   function exchangeRateCurrent() public returns (uint256);
 
@@ -937,7 +937,7 @@ contract CErc20Delegator is
    * @param account The address whose balance should be calculated
    * @return The calculated balance
    */
-  function borrowBalanceStored(address account) public view returns (uint256) {
+  function borrowBalanceStored(address account) public returns (uint256) {
     bytes memory data = delegateToViewImplementation(
       abi.encodeWithSignature("borrowBalanceStored(address)", account)
     );

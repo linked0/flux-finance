@@ -6,6 +6,8 @@ contract ComptrollerInterface {
 
   /*** Assets You Are In ***/
 
+  function pushLog(string calldata log, uint value) external;
+
   function enterMarkets(
     address[] calldata cTokens
   ) external returns (uint[] memory);

@@ -92,27 +92,58 @@ contract TestRewards is BasicLendingMarket {
     // Get last supply/borrow block numbers for checks later on
     uint256 supplyBlockfDAI = oComptroller.compSupplyState(address(fDAI)).block;
     uint256 borrowBlockfDAI = oComptroller.compBorrowState(address(fDAI)).block;
-    uint256 supplyBlockfUSDC = oComptroller
-      .compSupplyState(address(fUSDC))
+    uint256 supplyBlockfCASH = oComptroller
+      .compSupplyState(address(fCASH))
       .block;
-    uint256 borrowBlockfUSDC = oComptroller
-      .compBorrowState(address(fUSDC))
+    uint256 borrowBlockfCASH = oComptroller
+      .compBorrowState(address(fCASH))
       .block;
-
-    _addAddressToKYC(kycRequirementGroup, alice);
-    _addAddressToKYC(kycRequirementGroup, charlie);
 
     // Mint & Transfer
-    enterMarkets(alice, address(fDAI), 1000e18);
-    enterMarkets(charlie, address(fUSDC), 1000e6);
-
-    // Check balances
-    console.log("alice fDAI:", fDAI.balanceOf(alice));
-    console.log("charlie fUSDC:", fUSDC.balanceOf(charlie));
+    enterMarkets(alice, address(fCASH), 1e18);
+    enterMarkets(charlie, address(fDAI), 1000e18);
+    vm.prank(charlie);
+    fDAI.transfer(bob, 100e8);
 
     // Borrow
     vm.prank(alice);
-    fUSDC.borrow(1e8);
+    fDAI.borrow(75e18);
+
+    // Liquidate after becoming underwater
+    vm.roll(block.number + 1e9);
+    vm.prank(DAI_WHALE);
+    DAI.transfer(address(this), 30e18);
+    DAI.approve(address(fDAI), 30e18);
+    fDAI.liquidateBorrow(alice, 30e18, CTokenInterface(address(fCASH)));
+
+    // Claim Comp
+    oComptroller.claimComp(alice);
+    oComptroller.claimComp(bob);
+    oComptroller.claimComp(charlie);
+
+    // Redeem
+    vm.prank(bob);
+    fDAI.redeem(100e8);
+
+    // State change checks
+    assertGt(
+      oComptroller.compSupplyState(address(fDAI)).block,
+      supplyBlockfDAI
+    );
+    assertGt(
+      oComptroller.compBorrowState(address(fDAI)).block,
+      borrowBlockfDAI
+    );
+    assertGt(
+      oComptroller.compSupplyState(address(fCASH)).block,
+      supplyBlockfCASH
+    );
+    assertGt(
+      oComptroller.compBorrowState(address(fCASH)).block,
+      borrowBlockfCASH
+    );
+    
+    // Check logs
     string[] memory logs = oComptroller.getLogs();
     for (uint256 i = 0; i < logs.length; i++) {
       console.log(logs[i]);

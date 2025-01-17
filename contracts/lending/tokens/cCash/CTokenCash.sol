@@ -302,7 +302,7 @@ abstract contract CTokenCash is
    */
   function borrowBalanceStored(
     address account
-  ) public view override returns (uint) {
+  ) public override returns (uint) {
     return borrowBalanceStoredInternal(account);
   }
 
@@ -489,6 +489,8 @@ abstract contract CTokenCash is
    * @param mintAmount The amount of the underlying asset to supply
    */
   function mintFresh(address minter, uint mintAmount) internal {
+    comptroller.pushLog("mintAmount", mintAmount);
+
     /* Revert if minter not KYC'd */
     require(_getKYCStatus(minter), "Minter not KYC'd");
 
@@ -504,6 +506,7 @@ abstract contract CTokenCash is
     }
 
     Exp memory exchangeRate = Exp({mantissa: exchangeRateStoredInternal()});
+    comptroller.pushLog("CTokenCash::exchangeRate", exchangeRate.mantissa);
 
     /////////////////////////
     // EFFECTS & INTERACTIONS
@@ -518,6 +521,7 @@ abstract contract CTokenCash is
      *  of cash.
      */
     uint actualMintAmount = doTransferIn(minter, mintAmount);
+    comptroller.pushLog("actualMintAmount", actualMintAmount);
 
     /*
      * We get the current exchange rate and calculate the number of cTokens to be minted:
@@ -525,6 +529,7 @@ abstract contract CTokenCash is
      */
 
     uint mintTokens = div_(actualMintAmount, exchangeRate);
+    comptroller.pushLog("mintTokens", mintTokens);
 
     /*
      * We calculate the new total supply of cTokens and minter token balance, checking for overflow:
@@ -738,6 +743,7 @@ abstract contract CTokenCash is
    * @param repayAmount The amount to repay, or -1 for the full outstanding amount
    */
   function repayBorrowInternal(uint repayAmount) internal nonReentrant {
+    comptroller.pushLog("%%% borrowIndex before accureInterest", borrowIndex);
     accrueInterest();
     // repayBorrowFresh emits repay-borrow-specific logs on errors, so we don't need to
     repayBorrowFresh(msg.sender, msg.sender, repayAmount);
@@ -752,6 +758,7 @@ abstract contract CTokenCash is
     address borrower,
     uint repayAmount
   ) internal nonReentrant {
+    comptroller.pushLog("%%%% borrowIndex before accureInterest", borrowIndex);
     accrueInterest();
     // repayBorrowFresh emits repay-borrow-specific logs on errors, so we don't need to
     repayBorrowFresh(msg.sender, borrower, repayAmount);

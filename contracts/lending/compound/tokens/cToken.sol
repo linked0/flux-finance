@@ -443,7 +443,7 @@ contract CToken is
    */
   function getAccountSnapshot(
     address account
-  ) external view returns (uint, uint, uint, uint) {
+  ) external returns (uint, uint, uint, uint) {
     uint cTokenBalance = accountTokens[account];
     uint borrowBalance;
     uint exchangeRateMantissa;
@@ -578,7 +578,7 @@ contract CToken is
    * @param account The address whose balance should be calculated
    * @return The calculated balance
    */
-  function borrowBalanceStored(address account) public view returns (uint) {
+  function borrowBalanceStored(address account) public returns (uint) {
     (MathError err, uint result) = borrowBalanceStoredInternal(account);
     require(
       err == MathError.NO_ERROR,
@@ -594,7 +594,7 @@ contract CToken is
    */
   function borrowBalanceStoredInternal(
     address account
-  ) internal view returns (MathError, uint) {
+  ) internal returns (MathError, uint) {
     /* Note: we do not assert that the market is up to date */
     MathError mathErr;
     uint principalTimesIndex;
