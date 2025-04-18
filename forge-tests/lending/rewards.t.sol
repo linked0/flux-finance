@@ -27,6 +27,13 @@ contract TestRewards is BasicLendingMarket {
     oComptroller.deleteLogs();
   }
 
+  function test_print_logs() public {
+    string[] memory logs = oComptroller.getLogs();
+    for (uint256 i = 0; i < logs.length; i++) {
+      console.log(logs[i]);
+    }
+  }
+
   function test_rewards_noAccrual() public {
     // Do all actions that will update borrow/supply index & distribute borrow/supply comp
 
@@ -52,15 +59,20 @@ contract TestRewards is BasicLendingMarket {
 
     // Liquidate after becoming underwater
     vm.roll(block.number + 1e9);
+
     vm.prank(DAI_WHALE);
     DAI.transfer(address(this), 30e18);
     DAI.approve(address(fDAI), 30e18);
+
     fDAI.liquidateBorrow(alice, 30e18, CTokenInterface(address(fCASH)));
+    oComptroller.pushLog(unicode"🐹🐹🐹 LIQUIDATION COMPLETED", 0);
 
     // Claim Comp
     oComptroller.claimComp(alice);
     oComptroller.claimComp(bob);
     oComptroller.claimComp(charlie);
+
+    oComptroller.pushLog(unicode"🦁🦁🦁 CLAIM COMPLETED", 0);
 
     // Redeem
     vm.prank(bob);
@@ -83,74 +95,11 @@ contract TestRewards is BasicLendingMarket {
       oComptroller.compBorrowState(address(fCASH)).block,
       borrowBlockfCASH
     );
-    test_rewards_initial();
-  }
 
-  function test_rewards_noAccrual_jay() public {
-    // Do all actions that will update borrow/supply index & distribute borrow/supply comp
-
-    // Get last supply/borrow block numbers for checks later on
-    uint256 supplyBlockfDAI = oComptroller.compSupplyState(address(fDAI)).block;
-    uint256 borrowBlockfDAI = oComptroller.compBorrowState(address(fDAI)).block;
-    uint256 supplyBlockfCASH = oComptroller
-      .compSupplyState(address(fCASH))
-      .block;
-    uint256 borrowBlockfCASH = oComptroller
-      .compBorrowState(address(fCASH))
-      .block;
-
-    // Mint & Transfer
-    enterMarkets(alice, address(fCASH), 1e18);
-    enterMarkets(charlie, address(fDAI), 1000e18);
-    vm.prank(charlie);
-    fDAI.transfer(bob, 100e8);
-
-    // Borrow
-    vm.prank(alice);
-    fDAI.borrow(75e18);
-
-    // Liquidate after becoming underwater
-    vm.roll(block.number + 1e9);
-    vm.prank(DAI_WHALE);
-    DAI.transfer(address(this), 30e18);
-    DAI.approve(address(fDAI), 30e18);
-    fDAI.liquidateBorrow(alice, 30e18, CTokenInterface(address(fCASH)));
-
-    // Claim Comp
-    oComptroller.claimComp(alice);
-    oComptroller.claimComp(bob);
-    oComptroller.claimComp(charlie);
-
-    // Redeem
-    vm.prank(bob);
-    fDAI.redeem(100e8);
-
-    // State change checks
-    assertGt(
-      oComptroller.compSupplyState(address(fDAI)).block,
-      supplyBlockfDAI
-    );
-    assertGt(
-      oComptroller.compBorrowState(address(fDAI)).block,
-      borrowBlockfDAI
-    );
-    assertGt(
-      oComptroller.compSupplyState(address(fCASH)).block,
-      supplyBlockfCASH
-    );
-    assertGt(
-      oComptroller.compBorrowState(address(fCASH)).block,
-      borrowBlockfCASH
-    );
+    test_print_logs();
     
-    // Check logs
-    string[] memory logs = oComptroller.getLogs();
-    for (uint256 i = 0; i < logs.length; i++) {
-      console.log(logs[i]);
-    }
     test_rewards_initial();
   }
-
 
   function test_rewards_accrueSupply() public {
     _seedComptrollerWithOndo(1_000_000e18); //1M Ondo
@@ -160,6 +109,9 @@ contract TestRewards is BasicLendingMarket {
     oComptroller.claimComp(alice);
     assertEq(ONDO_TOKEN.balanceOf(alice), 10000 * 1e17);
     // assertGt(ONDO_TOKEN.balanceOf(alice), 0);
+
+    test_print_logs();
+    oComptroller.deleteLogs();
   }
 
   function test_rewards_accrueBorrow() public {

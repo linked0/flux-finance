@@ -122,5 +122,5 @@ contract ComptrollerInterface {
     address cTokenBorrowed,
     address cTokenCollateral,
     uint repayAmount
-  ) external view returns (uint, uint);
+  ) external returns (uint, uint);
 }

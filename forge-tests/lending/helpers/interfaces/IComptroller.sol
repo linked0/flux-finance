@@ -17,6 +17,7 @@ interface IComptroller {
 
   function getLog(uint index) external returns (string memory);
   function getLogs() external returns (string[] memory);
+  function pushLog(string calldata log, uint value) external;
   function deleteLogs() external;
 
   function borrowGuardianPaused(address) external view returns (bool);
@@ -117,7 +118,7 @@ interface IComptroller {
     address cTokenBorrowed,
     address cTokenCollateral,
     uint repayAmount
-  ) external view returns (uint, uint);
+  ) external returns (uint, uint);
 
   function _setPauseGuardian(address) external returns (uint);
 

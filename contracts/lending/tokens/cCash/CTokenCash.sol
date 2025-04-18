@@ -392,6 +392,7 @@ abstract contract CTokenCash is
    *   up to the current block and writes new checkpoint to storage.
    */
   function accrueInterest() public virtual override returns (uint) {
+    comptroller.pushLog(unicode"🪀🪀🪀 CTokenCash::accrueInterest", 0);
     /* Remember the initial block number */
     uint currentBlockNumber = getBlockNumber();
     uint accrualBlockNumberPrior = accrualBlockNumber;
@@ -489,7 +490,7 @@ abstract contract CTokenCash is
    * @param mintAmount The amount of the underlying asset to supply
    */
   function mintFresh(address minter, uint mintAmount) internal {
-    comptroller.pushLog("mintAmount", mintAmount);
+    comptroller.pushLog(unicode"🪀🪀🪀 CTokenCash::mintAmount", mintAmount);
 
     /* Revert if minter not KYC'd */
     require(_getKYCStatus(minter), "Minter not KYC'd");

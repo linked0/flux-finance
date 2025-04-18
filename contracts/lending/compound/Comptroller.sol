@@ -493,6 +493,7 @@ contract Comptroller is
 
     // Keep the flywheel moving
     Exp memory borrowIndex = Exp({mantissa: CToken(cToken).borrowIndex()});
+    logs.push(uintToString("borrowIndex", borrowIndex.mantissa));
     updateCompBorrowIndex(cToken, borrowIndex);
     distributeBorrowerComp(cToken, borrower, borrowIndex);
 
@@ -955,7 +956,6 @@ function addressToString(string memory prefix, address _addr) internal pure retu
       }
       // logs.push(uintToString("vars.cTokenBalance", vars.cTokenBalance));
       logs.push(uintToString("vars.collateralFactor", vars.collateralFactor.mantissa));
-      // logs.push(uintToString("vars.oraclePriceMantissa", vars.oraclePriceMantissa));
       vars.oraclePrice = Exp({mantissa: vars.oraclePriceMantissa});
       logs.push(uintToString("vars.oraclePriceMantissa", vars.oraclePriceMantissa));
 
@@ -981,7 +981,6 @@ function addressToString(string memory prefix, address _addr) internal pure retu
 
       // Calculate effects of interacting with cTokenModify
       if (asset == cTokenModify) {
-        logs.push(uintToString("\t### cTokenModify", uint256(address(cTokenModify))));
         // redeem effect
         // sumBorrowPlusEffects += tokensToDenom * redeemTokens
         vars.sumBorrowPlusEffects = mul_ScalarTruncateAddUInt(
@@ -1031,7 +1030,7 @@ function addressToString(string memory prefix, address _addr) internal pure retu
     address cTokenBorrowed,
     address cTokenCollateral,
     uint actualRepayAmount
-  ) external view returns (uint, uint) {
+  ) external returns (uint, uint) {
     /* Read oracle prices for borrowed and collateral markets */
     uint priceBorrowedMantissa = oracle.getUnderlyingPrice(
       CToken(cTokenBorrowed)
@@ -1042,6 +1041,9 @@ function addressToString(string memory prefix, address _addr) internal pure retu
     if (priceBorrowedMantissa == 0 || priceCollateralMantissa == 0) {
       return (uint(Error.PRICE_ERROR), 0);
     }
+
+    logs.push(uintToString("### priceCollateralMantissa", priceCollateralMantissa));
+    logs.push(uintToString("### priceBorrowedMantissa", priceBorrowedMantissa));
 
     /*
      * Get the exchange rate and calculate the number of collateral tokens to seize:
@@ -1521,7 +1523,10 @@ function addressToString(string memory prefix, address _addr) internal pure retu
       getBlockNumber(),
       "block number exceeds 32 bits"
     );
+    logs.push(uintToString("&&& updateCompSupplyIndex blockNumber", uint256(blockNumber)));
     uint deltaBlocks = sub_(uint(blockNumber), uint(supplyState.block));
+    logs.push(uintToString("&&& deltaBlocks", deltaBlocks));
+    logs.push(uintToString("&&& supplySpeed", supplySpeed));
     if (deltaBlocks > 0 && supplySpeed > 0) {
       uint supplyTokens = CToken(cToken).totalSupply();
       uint compAccrued = mul_(deltaBlocks, supplySpeed);
@@ -1553,12 +1558,20 @@ function addressToString(string memory prefix, address _addr) internal pure retu
       getBlockNumber(),
       "block number exceeds 32 bits"
     );
+
+    logs.push(uintToString("$$$ updateCompBorrowIndex blockNumber", uint256(blockNumber)));
+    logs.push(uintToString("$$$ cToken.totalBorrows", CToken(cToken).totalBorrows()));
+    logs.push(uintToString("$$$ marketBorrowIndex", marketBorrowIndex.mantissa));
+    logs.push(uintToString("$$$ borrowIndex", borrowState.index));
     uint deltaBlocks = sub_(uint(blockNumber), uint(borrowState.block));
+    logs.push(uintToString("$$$ deltaBlocks", deltaBlocks));
+    logs.push(uintToString("$$$ borrowSpeed", borrowSpeed));
     if (deltaBlocks > 0 && borrowSpeed > 0) {
       uint borrowAmount = div_(
         CToken(cToken).totalBorrows(),
         marketBorrowIndex
       );
+      logs.push(uintToString("%%% borrowAmount", borrowAmount));
       uint compAccrued = mul_(deltaBlocks, borrowSpeed);
       Double memory ratio = borrowAmount > 0
         ? fraction(compAccrued, borrowAmount)
@@ -1637,6 +1650,7 @@ function addressToString(string memory prefix, address _addr) internal pure retu
     uint borrowIndex = borrowState.index;
     uint borrowerIndex = compBorrowerIndex[cToken][borrower];
 
+    logs.push(uintToString("!!! distributeBorrowerComp borrowIndex", borrowIndex));
     // Update borrowers's index to the current index since we are distributing accrued COMP
     compBorrowerIndex[cToken][borrower] = borrowIndex;
 
@@ -1646,6 +1660,7 @@ function addressToString(string memory prefix, address _addr) internal pure retu
       // set for the market.
       borrowerIndex = compInitialIndex;
     }
+    // logs.push(uintToString("!!!! distributeBorrowerComp borrowerIndex", borrowerIndex));
 
     // Calculate change in the cumulative sum of the COMP per borrowed unit accrued
     Double memory deltaIndex = Double({
@@ -1659,8 +1674,11 @@ function addressToString(string memory prefix, address _addr) internal pure retu
 
     // Calculate COMP accrued: cTokenAmount * accruedPerBorrowedUnit
     uint borrowerDelta = mul_(borrowerAmount, deltaIndex);
+    // logs.push(uintToString("!!! borrowerDelta", borrowerDelta));
+    // logs.push(uintToString("!!! compAccrued[borrower]", compAccrued[borrower]));
 
     uint borrowerAccrued = add_(compAccrued[borrower], borrowerDelta);
+    // logs.push(uintToString("!!! borrowerAccrued", borrowerAccrued));
     compAccrued[borrower] = borrowerAccrued;
 
     emit DistributedBorrowerComp(

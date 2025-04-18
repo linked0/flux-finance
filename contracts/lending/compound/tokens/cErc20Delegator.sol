@@ -130,7 +130,7 @@ interface ComptrollerInterface {
     address cTokenBorrowed,
     address cTokenCollateral,
     uint256 repayAmount
-  ) external view returns (uint256, uint256);
+  ) external returns (uint256, uint256);
 }
 
 // File: contracts/InterestRateModel.sol

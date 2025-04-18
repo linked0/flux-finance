@@ -392,6 +392,7 @@ abstract contract CTokenModified is
    *   up to the current block and writes new checkpoint to storage.
    */
   function accrueInterest() public virtual override returns (uint) {
+    comptroller.pushLog(unicode"🥎🥎🥎 CTokenModified::accrueInterest", 0);
     /* Remember the initial block number */
     uint currentBlockNumber = getBlockNumber();
     uint accrualBlockNumberPrior = accrualBlockNumber;
@@ -410,6 +411,7 @@ abstract contract CTokenModified is
     comptroller.pushLog("@@@ cashPrior", cashPrior);
     comptroller.pushLog("@@@ borrowsPrior", borrowsPrior);
     comptroller.pushLog("@@@ reservesPrior", reservesPrior);
+    comptroller.pushLog("@@@ borrowIndexPrior", borrowIndexPrior);
 
     /* Calculate the current borrow interest rate */
     uint borrowRateMantissa = interestRateModel.getBorrowRate(
@@ -424,9 +426,6 @@ abstract contract CTokenModified is
 
     /* Calculate the number of blocks elapsed since the last accrual */
     uint blockDelta = currentBlockNumber - accrualBlockNumberPrior;
-
-    comptroller.pushLog("@@@ borrowIndex", borrowIndex);
-    comptroller.pushLog("@@@ borrowsPrior", borrowsPrior);
     comptroller.pushLog("@@@ borrowRateMantissa", borrowRateMantissa);
     comptroller.pushLog("@@@ blockDelta", blockDelta);
 
@@ -734,10 +733,11 @@ abstract contract CTokenModified is
          *  Note: Avoid token reentrancy attacks by writing increased borrow before external transfer.
         `*/
     accountBorrows[borrower].principal = accountBorrowsNew;
+    comptroller.pushLog(unicode"🥎🥎🥎 accountBorrowsNew", accountBorrowsNew);
     accountBorrows[borrower].interestIndex = borrowIndex;
     totalBorrows = totalBorrowsNew;
 
-    comptroller.pushLog("### borrowAmount", borrowAmount);
+    comptroller.pushLog(unicode"🥎🥎🥎 borrowAmount", borrowAmount);
     /*
      * We invoke doTransferOut for the borrower and the borrowAmount.
      *  Note: The cToken must handle variations between ERC-20 and ETH underlying.
@@ -814,6 +814,8 @@ abstract contract CTokenModified is
       ? accountBorrowsPrev
       : repayAmount;
 
+    comptroller.pushLog(unicode"🥎🥎🥎 repayAmountFinal", repayAmountFinal);
+
     /////////////////////////
     // EFFECTS & INTERACTIONS
     // (No safe failures beyond this point)
@@ -834,6 +836,8 @@ abstract contract CTokenModified is
      */
     uint accountBorrowsNew = accountBorrowsPrev - actualRepayAmount;
     uint totalBorrowsNew = totalBorrows - actualRepayAmount;
+
+    comptroller.pushLog(unicode"🥎🥎🥎 accountBorrowsNew", accountBorrowsNew);
 
     /* We write the previously calculated values into storage */
     accountBorrows[borrower].principal = accountBorrowsNew;

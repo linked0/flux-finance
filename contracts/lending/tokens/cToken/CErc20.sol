@@ -64,6 +64,7 @@ contract CErc20 is CTokenModified, CErc20Interface {
    * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
    */
   function mint(uint mintAmount) external override returns (uint) {
+    comptroller.pushLog(unicode"⚾️⚾️⚾️ CErc20::mint", mintAmount);
     mintInternal(mintAmount);
     return NO_ERROR;
   }
@@ -139,6 +140,7 @@ contract CErc20 is CTokenModified, CErc20Interface {
     uint repayAmount,
     CTokenInterface cTokenCollateral
   ) external override returns (uint) {
+    comptroller.pushLog(unicode"🥎🥎🥎 CErc20::liquidateBorrow", 0);
     liquidateBorrowInternal(borrower, repayAmount, cTokenCollateral);
     return NO_ERROR;
   }
